@@ -1,4 +1,11 @@
 node {
+
+     // ====== TOOLS ======
+    def mvnHome = tool name: 'maven-3.9', type: 'maven'
+    def javaHome = tool name: 'jdk21', type: 'jdk'
+ 
+    // ====== ENV VARIABLES ======
+    env.PATH = "${mvnHome}\\bin;${javaHome}\\bin;${env.PATH}"
  
     // ====== PARAMETERS ======
     properties([
@@ -11,13 +18,6 @@ node {
         ])
     ])
  
-    // ====== TOOLS ======
-    def mvnHome = tool 'maven-3.9'
-    def javaHome = tool 'jdk21'
- 
-    // ====== ENV VARIABLES ======
-    env.PATH = "${mvnHome}/bin:${javaHome}/bin:${env.PATH}"
- 
     try {
  
         stage('Checkout') {
@@ -27,12 +27,12 @@ node {
  
         stage('Build') {
             echo "Building project for stack: ${params.Stack}"
-            bat "mvn clean compile -DStack=${params.Stack}"
+            bat "${mvnHome}\\bin\\mvn clean compile -DStack=${params.Stack}"
         }
  
         stage('Test') {
             echo "Running tests..."
-            bat "mvn test -DStack=${params.Stack}"
+             bat "${mvnHome}\\bin\\mvn test -DStack=${params.Stack}"
         }
  
         stage('Publish Test Reports') {
