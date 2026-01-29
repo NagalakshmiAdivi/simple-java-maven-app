@@ -42,7 +42,7 @@ pipeline {
         stage('Test') {
             steps {
                 echo "Running tests..."
-                bat "${tool 'Maven-3.9'}\\bin\\mvn test -DStack=${params.Stack}"
+                bat "${tool 'maven-3.9'}\\bin\\mvn test -DStack=${params.Stack}"
             }
         }
  
