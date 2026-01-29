@@ -1,56 +1,68 @@
-node {
-
-     // ====== TOOLS ======
-    def mvnHome = tool name: 'maven-3.9', type: 'maven'
-    def javaHome = tool name: 'jdk21', type: 'jdk'
+pipeline {
+    agent any
  
-    // ====== ENV VARIABLES ======
-    env.PATH = "${mvnHome}\\bin;${javaHome}\\bin;${env.PATH}"
-    bat 'java -version'
     // ====== PARAMETERS ======
-    properties([
-        parameters([
-            choice(
-                name: 'Stack',
-                choices: ['QA', 'UAT', 'PROD'],
-                description: 'Select environment stack'
-            )
-        ])
-    ])
+    parameters {
+        choice(
+            name: 'Stack',
+            choices: ['QA','PROD'],
+            description: 'Select environment stack'
+        )
+    }
  
-    try {
+    // ====== TOOLS ======
+    tools {
+        jdk 'jdk21'
+        maven 'maven-3.9'
+    }
+ 
+    environment {
+        // Maven and Java paths will be added automatically from tools
+        PATH = "${tool 'maven-3.9'}\\bin;${tool 'jdk21'}\\bin;${env.PATH}"
+    }
+ 
+    stages {
  
         stage('Checkout') {
-            echo "Checking out source code..."
-            checkout scm
+            steps {
+                echo "Checking out code from configured SCM..."
+                checkout scm
+            }
         }
  
         stage('Build') {
-            echo "Building project for stack: ${params.Stack}"
-            bat "${mvnHome}\\bin\\mvn clean compile -DStack=${params.Stack}"
+            steps {
+                echo "Building project for stack: ${params.Stack}"
+                bat "${tool 'maven-3.9'}\\bin\\mvn clean compile -DStack=${params.Stack}"
+            }
         }
  
         stage('Test') {
-            echo "Running tests..."
-             bat "${mvnHome}\\bin\\mvn test -DStack=${params.Stack}"
+            steps {
+                echo "Running tests..."
+                bat "${tool 'Maven-3.9'}\\bin\\mvn test -DStack=${params.Stack}"
+            }
         }
  
         stage('Publish Test Reports') {
-            junit '**/target/surefire-reports/*.xml'
+            steps {
+                junit '**/target/surefire-reports/*.xml'
+            }
         }
+    }
  
-    } catch (err) {
- 
-        currentBuild.result = 'FAILURE'
-        echo "Build failed: ${err}"
-        throw err
- 
-    } finally {
- 
-        stage('Cleanup') {
+    post {
+        always {
             echo "Cleaning workspace..."
             cleanWs()
         }
+ 
+        success {
+            echo "Build succeeded!"
+        }
+ 
+        failure {
+            echo "Build failed!"
+        }
     }
 }
- 
