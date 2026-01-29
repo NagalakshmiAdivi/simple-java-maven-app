@@ -21,5 +21,6 @@ public class AppTest
     {
         App app = new App();
         assertEquals("Hello World!", app.getMessage());
+        System.out.println("Print the jenkins parameter#### "+ System.getProperty("Stack"));
     }
 }
