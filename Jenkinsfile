@@ -6,7 +6,7 @@ node {
  
     // ====== ENV VARIABLES ======
     env.PATH = "${mvnHome}\\bin;${javaHome}\\bin;${env.PATH}"
- 
+    bat 'java -version'
     // ====== PARAMETERS ======
     properties([
         parameters([
