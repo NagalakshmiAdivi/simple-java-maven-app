@@ -12,8 +12,8 @@ node {
     ])
  
     // ====== TOOLS ======
-    def mvnHome = tool 'Maven-3.9'
-    def javaHome = tool 'JDK-21'
+    def mvnHome = tool 'maven-3.9'
+    def javaHome = tool 'jdk21'
  
     // ====== ENV VARIABLES ======
     env.PATH = "${mvnHome}/bin:${javaHome}/bin:${env.PATH}"
